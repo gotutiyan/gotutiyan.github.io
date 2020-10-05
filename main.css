@@ -1,8 +1,19 @@
 #content{
-    width: 80%;
-    
+    width: 50%;
+    margin: 0em auto;
+}
+
+/*レスポンシブ対応*/
+@media screen and (max-width:700px){
+    #content{
+        width:100%;
+    }
 }
 
 body{
     font-family: 'Open Sans', sans-serif;
+}
+
+h1{
+    border-bottom: cornflowerblue solid 5px;
 }
