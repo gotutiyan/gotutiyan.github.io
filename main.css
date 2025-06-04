@@ -1,10 +1,9 @@
 #content{
-    width: 50%;
+    width: 80%;
     margin: 0em auto;
 }
 
-/*レスポンシブ対応*/
-@media screen and (max-width:700px){
+@media screen and (max-width:767px){
     #content{
         width:100%;
     }
@@ -16,4 +15,9 @@ body{
 
 h1{
     border-bottom: cornflowerblue solid 5px;
+}
+
+#content ul li,
+#content ol li {
+    margin-bottom: 0.5em;
 }
