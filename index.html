@@ -22,7 +22,6 @@
     <section class="section">
       <div class="section-head">
         <h1>Publications</h1>
-        <p class="subtle">`data/publications.bib` から自動表示</p>
       </div>
       <div id="publications-root" class="publication-groups" aria-live="polite"></div>
     </section>
@@ -51,26 +50,20 @@
     <section class="section">
       <h1>Education</h1>
       <ul class="simple-list">
-        <li>2023.4 - now: 奈良先端科学技術大学院大学 <a href="https://nlp.naist.jp/ja/">自然言語処理学研究室</a> 博士後期課程</li>
+        <li>2023.4 - 2026.3 奈良先端科学技術大学院大学 <a href="https://nlp.naist.jp/ja/">自然言語処理学研究室</a> 博士（工学）</li>
         <li>2021.4 - 2023.3: 奈良先端科学技術大学院大学 <a href="https://nlp.naist.jp/ja/">自然言語処理学研究室</a> 修士（工学）</li>
-        <li>2017.4 - 2021.3: 甲南大学 知能情報学部 <a href="http://nlp.ii.konan-u.ac.jp">言語処理研究室</a></li>
+        <li>2017.4 - 2021.3: 甲南大学 知能情報学部 <a href="http://nlp.ii.konan-u.ac.jp">言語処理研究室</a> 学士（工学）</li>
       </ul>
     </section>
   </main>
 
   <script>
-    const sectionOrder = [
-      "journal",
-      "international",
-      "domestic",
-      "symposium"
+    const sectionConfigs = [
+      { key: "journal", title: "Journal Paper (Refereed)", path: "./data/journal.bib" },
+      { key: "international", title: "International Conference/Workshop (Refereed)", path: "./data/international.bib" },
+      { key: "domestic", title: "Domestic Conference etc. (Non-refereed)", path: "./data/domestic.bib" },
+      { key: "symposium", title: "Symposium etc. (Non-archival)", path: "./data/symposium.bib" }
     ];
-    const sectionTitle = {
-      journal: "Journal Paper (Refereed)",
-      international: "International Conference/Workshop (Refereed)",
-      domestic: "Domestic Conference etc. (Non-refereed)",
-      symposium: "Symposium etc. (Non-archival)"
-    };
     const linkLabels = {
       anthology: "Anthology",
       paper: "Paper",
@@ -88,6 +81,30 @@
 
     function splitAuthors(value) {
       return value.split(/\s+and\s+/i).map((v) => normalizeValue(v)).filter(Boolean);
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function isMyName(author) {
+      const compact = author.replace(/\s+/g, "").toLowerCase();
+      return compact === "五藤巧" || compact === "takumigoto" || compact === "takumigotou";
+    }
+
+    function formatAuthors(authorField) {
+      const authors = splitAuthors(authorField || "");
+      return authors
+        .map((author) => {
+          const safe = escapeHtml(author);
+          return isMyName(author) ? "<strong>" + safe + "</strong>" : safe;
+        })
+        .join(", ");
     }
 
     function cleanBibText(text) {
@@ -131,7 +148,7 @@
     function renderEntry(entry) {
       const li = document.createElement("li");
       li.className = "publication-item";
-      const authors = splitAuthors(entry.author || "").join(", ");
+      const authors = formatAuthors(entry.author || "");
       const links = parseLinks(entry);
       const yearText = entry.year ? " (" + entry.year + ")" : "";
       const noteText = entry.note ? "<span class=\"note\">" + entry.note + "</span>" : "";
@@ -144,18 +161,16 @@
       return li;
     }
 
-    function renderPublications(entries) {
+    function renderPublications(sectionEntries) {
       const root = document.getElementById("publications-root");
       root.innerHTML = "";
-      for (const sec of sectionOrder) {
-        const groupEntries = entries
-          .filter((e) => e.category === sec)
-          .sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
-        if (groupEntries.length === 0) continue;
+      for (const section of sectionConfigs) {
+        const groupEntries = (sectionEntries[section.key] || []).sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
+        if (!groupEntries.length) continue;
         const article = document.createElement("article");
         article.className = "publication-group";
         const h2 = document.createElement("h2");
-        h2.textContent = sectionTitle[sec] || sec;
+        h2.textContent = section.title;
         const ul = document.createElement("ul");
         ul.className = "publication-list";
         for (const entry of groupEntries) ul.appendChild(renderEntry(entry));
@@ -169,12 +184,17 @@
       const root = document.getElementById("publications-root");
       root.innerHTML = "<p class=\"subtle\">Loading publications...</p>";
       try {
-        const res = await fetch("./data/publications.bib");
-        if (!res.ok) throw new Error("Failed to fetch bib file");
-        const text = await res.text();
-        renderPublications(parseBibtexEntries(text));
+        const pairs = await Promise.all(
+          sectionConfigs.map(async (section) => {
+            const res = await fetch(section.path);
+            if (!res.ok) throw new Error("Failed to fetch " + section.path);
+            const text = await res.text();
+            return [section.key, parseBibtexEntries(text)];
+          })
+        );
+        renderPublications(Object.fromEntries(pairs));
       } catch (err) {
-        root.innerHTML = "<p class=\"subtle\">Failed to load publications.bib</p>";
+        root.innerHTML = "<p class=\"subtle\">Failed to load bib files</p>";
       }
     }
 
