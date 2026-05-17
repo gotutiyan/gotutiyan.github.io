@@ -114,7 +114,7 @@
         .map((authorRaw) => {
           const author = reorderEnglishName(authorRaw);
           const safe = escapeHtml(author);
-          return isMyName(authorRaw) || isMyName(author) ? "<strong>" + safe + "</strong>" : safe;
+          return isMyName(authorRaw) || isMyName(author) ? "<strong><u>" + safe + "</u></strong>" : safe;
         })
         .join(", ");
     }
