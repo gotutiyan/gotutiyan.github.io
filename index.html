@@ -66,6 +66,7 @@
     ];
     const linkLabels = {
       anthology: "Anthology",
+      url: "URL",
       paper: "Paper",
       arxiv: "arXiv",
       poster: "Poster",
@@ -94,7 +95,7 @@
 
     function isMyName(author) {
       const compact = author.replace(/\s+/g, "").toLowerCase();
-      return compact === "五藤巧" || compact === "takumigoto" || compact === "takumigotou";
+      return compact === "五藤巧" || compact === "takumigoto" || compact === "takumigotou" || compact === "goto,takumi";
     }
 
     function formatAuthors(authorField) {
@@ -120,7 +121,7 @@
         if (!typeMatch) continue;
         const entry = { type: typeMatch[1], id: typeMatch[2] };
         const body = block.slice(typeMatch[0].length);
-        const fieldRegex = /(\w+)\s*=\s*(\{(?:[^{}]|\{[^{}]*\})*\}|"(?:[^"\\]|\\.)*")\s*,?/g;
+        const fieldRegex = /(\w+)\s*=\s*(\{(?:[^{}]|\{[^{}]*\})*\}|"(?:[^"\\]|\\.)*"|[A-Za-z][A-Za-z0-9_-]*)\s*,?/g;
         let m;
         while ((m = fieldRegex.exec(body)) !== null) {
           const key = m[1].toLowerCase();
