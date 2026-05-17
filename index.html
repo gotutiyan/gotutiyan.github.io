@@ -98,12 +98,23 @@
       return compact === "五藤巧" || compact === "takumigoto" || compact === "takumigotou" || compact === "goto,takumi";
     }
 
+    function reorderEnglishName(author) {
+      if (!author.includes(",")) return author;
+      const parts = author.split(",").map((p) => normalizeValue(p));
+      if (parts.length !== 2) return author;
+      const last = parts[0];
+      const first = parts[1];
+      if (!/^[A-Za-z .'-]+$/.test(last + " " + first)) return author;
+      return normalizeValue(first + " " + last);
+    }
+
     function formatAuthors(authorField) {
       const authors = splitAuthors(authorField || "");
       return authors
-        .map((author) => {
+        .map((authorRaw) => {
+          const author = reorderEnglishName(authorRaw);
           const safe = escapeHtml(author);
-          return isMyName(author) ? "<strong>" + safe + "</strong>" : safe;
+          return isMyName(authorRaw) || isMyName(author) ? "<strong>" + safe + "</strong>" : safe;
         })
         .join(", ");
     }
