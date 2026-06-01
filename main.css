@@ -117,6 +117,111 @@ h2 {
   font-weight: 500;
 }
 
+.submission-history {
+  margin-top: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 2px 0 6px;
+}
+
+.submission-history ol {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  min-width: max-content;
+  padding: 0;
+}
+
+.history-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px max-content;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.history-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 38px;
+  width: calc(100% + 20px);
+  height: 2px;
+  background: var(--line);
+}
+
+.history-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: -23px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--line);
+  border-top: 2px solid var(--line);
+  transform: rotate(45deg);
+}
+
+.history-node {
+  position: relative;
+  z-index: 2;
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.history-step-accepted .history-node {
+  border-color: #2f8f5b;
+  color: #2f8f5b;
+}
+
+.history-step-rejected .history-node {
+  border-color: #bd4b4b;
+  color: #bd4b4b;
+}
+
+.history-step-withdrawn .history-node {
+  border-color: #8a6f3d;
+  color: #8a6f3d;
+}
+
+.history-step-revision .history-node {
+  border-color: #3976a8;
+  color: #3976a8;
+}
+
+.history-meta {
+  display: grid;
+  gap: 1px;
+  padding-top: 1px;
+  white-space: normal;
+}
+
+.history-round,
+.history-venue {
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.history-result,
+.history-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
 @media (max-width: 767px) {
   .page {
     width: calc(100% - 20px);
@@ -126,5 +231,9 @@ h2 {
   .hero,
   .section {
     padding: 16px;
+  }
+
+  .history-step {
+    min-width: 128px;
   }
 }
