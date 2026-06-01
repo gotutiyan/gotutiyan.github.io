@@ -166,6 +166,9 @@
       if (!history) return [];
       if (Array.isArray(history)) return history;
       if (Array.isArray(history.events)) return history.events;
+      if (Array.isArray(history.history)) return history.history;
+      if (Array.isArray(history.submissions)) return history.submissions;
+      if (history.venue || history.conference || history.journal || history.result || history.status) return [history];
       return [];
     }
 

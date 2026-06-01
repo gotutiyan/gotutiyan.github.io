@@ -1,5 +1,5 @@
 {
-  "goto-etal-2025-reliability": {
+  "__schema__": {
     "description": "Use BibTeX entry ids as keys. Each value is an array of submission events in chronological order.",
     "event": {
       "round": "Submission 1",
@@ -10,16 +10,24 @@
     },
     "results": ["accept", "reject", "withdraw", "revise", "submit"]
   },
-  "__example__": [
+  "goto-etal-2025-improving": [
     {
-      "round": "Submission 1",
-      "venue": "ACL 2025",
+      "round": "ARR 2024 June.",
+      "result": "reject",
+      "date": "2024"
+    },
+    {
+      "round": "ARR 2024 Dec.",
+      "result": "reject",
+      "date": "2024"
+    },
+    {
+      "round": "ARR 2025 Feb.",
       "result": "reject",
       "date": "2025"
     },
     {
-      "round": "Submission 2",
-      "venue": "EMNLP 2025 Findings",
+      "round": "ACL 2025 SRW",
       "result": "accept",
       "date": "2025"
     }
