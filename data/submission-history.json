@@ -10,13 +10,6 @@
     },
     "results": ["accept", "reject", "withdraw", "revise", "submit"]
   },
-  "goto2026tacl":[
-    {
-      "round": "TACL 2025 Aug.",
-      "result": "conditional accept → accept as is.",
-      "date": "2025"
-    }
-  ],
   "goto-etal-2026-edit": [
     {
       "round": "ARR 2026 Jan.",
