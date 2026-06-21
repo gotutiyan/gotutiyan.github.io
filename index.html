@@ -64,9 +64,10 @@
       { key: "domestic", title: "Domestic Conference etc. (Non-refereed)", path: "./data/domestic.bib" },
       { key: "symposium", title: "Symposium etc. (Non-archival)", path: "./data/symposium.bib" }
     ];
+    const submissionHistoryPath = "./data/submission-history.json";
     const linkLabels = {
-      anthology: "Anthology",
-      url: "URL",
+      anthology: "ACL Anthology",
+      url: "ACL Anthology",
       paper: "Paper",
       arxiv: "arXiv",
       poster: "Poster",
@@ -85,12 +86,16 @@
     }
 
     function escapeHtml(value) {
-      return value
+      return String(value || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, "&#96;");
     }
 
     function isMyName(author) {
@@ -157,23 +162,81 @@
       return links;
     }
 
-    function renderEntry(entry) {
+    function normalizeHistoryEvents(history) {
+      if (!history) return [];
+      if (Array.isArray(history)) return history;
+      if (Array.isArray(history.events)) return history.events;
+      if (Array.isArray(history.history)) return history.history;
+      if (Array.isArray(history.submissions)) return history.submissions;
+      if (history.venue || history.conference || history.journal || history.result || history.status) return [history];
+      return [];
+    }
+
+    function normalizeResult(result) {
+      const value = normalizeValue(result).toLowerCase();
+      if (["accept", "accepted", "採択"].includes(value)) return "accepted";
+      if (["reject", "rejected", "不採択"].includes(value)) return "rejected";
+      if (["withdraw", "withdrawn", "取り下げ"].includes(value)) return "withdrawn";
+      if (["revise", "revision", "major revision", "minor revision", "改訂"].includes(value)) return "revision";
+      return "submitted";
+    }
+
+    function resultLabel(result) {
+      return {
+        accepted: "Accept",
+        rejected: "Reject",
+        withdrawn: "Withdraw",
+        revision: "Revise",
+        submitted: "Submit"
+      }[result] || "Submit";
+    }
+
+    function renderSubmissionHistory(history) {
+      const events = normalizeHistoryEvents(history);
+      if (!events.length) return "";
+      const items = events.map((event, idx) => {
+        const result = normalizeResult(event.result || event.status);
+        const venue = escapeHtml(event.venue || event.conference || event.journal || "");
+        const date = escapeHtml(event.date || event.year || "");
+        const round = escapeHtml(event.round || event.label || "Submission " + (idx + 1));
+        const note = event.note ? "<span class=\"history-note\">" + escapeHtml(event.note) + "</span>" : "";
+        const aria = escapeAttr([round, venue, resultLabel(result), date, event.note].filter(Boolean).join(", "));
+        return (
+          "<li class=\"history-step history-step-" + result + "\" aria-label=\"" + aria + "\">" +
+            "<span class=\"history-node\">" + resultLabel(result).charAt(0) + "</span>" +
+            "<span class=\"history-meta\">" +
+              "<span class=\"history-round\">" + round + "</span>" +
+              (venue ? "<span class=\"history-venue\">" + venue + "</span>" : "") +
+              "<span class=\"history-result\">" + resultLabel(result) + (date ? " / " + date : "") + "</span>" +
+              note +
+            "</span>" +
+          "</li>"
+        );
+      }).join("");
+      return "<div class=\"submission-history\" aria-label=\"Submission history\"><ol>" + items + "</ol></div>";
+    }
+
+    function renderEntry(entry, submissionHistory) {
       const li = document.createElement("li");
       li.className = "publication-item";
       const authors = formatAuthors(entry.author || "");
       const links = parseLinks(entry);
       const yearText = entry.year ? " (" + entry.year + ")" : "";
-      const noteText = entry.note ? "<span class=\"note\">" + entry.note + "</span>" : "";
-      const linksHtml = links.map((l) => "<a href=\"" + l.href + "\">[" + l.label + "]</a>").join(" ");
+      const title = escapeHtml(entry.title || "");
+      const venue = escapeHtml(entry.booktitle || entry.journal || "");
+      const noteText = entry.note ? "<span class=\"note\">" + escapeHtml(entry.note) + "</span>" : "";
+      const linksHtml = links.map((l) => "<a href=\"" + escapeAttr(l.href) + "\">[" + l.label + "]</a>").join(" ");
+      const historyHtml = renderSubmissionHistory(submissionHistory);
       li.innerHTML =
-        "<p><span class=\"authors\">" + authors + "</span>, \"" + (entry.title || "") + "\", " +
-        (entry.booktitle || entry.journal || "") + yearText + "</p>" +
+        "<p><span class=\"authors\">" + authors + "</span>, \"" + title + "\", " +
+        venue + yearText + "</p>" +
         (linksHtml ? "<p class=\"pub-links\">" + linksHtml + "</p>" : "") +
-        (noteText ? "<p>" + noteText + "</p>" : "");
+        (noteText ? "<p>" + noteText + "</p>" : "") +
+        historyHtml;
       return li;
     }
 
-    function renderPublications(sectionEntries) {
+    function renderPublications(sectionEntries, submissionHistories) {
       const root = document.getElementById("publications-root");
       root.innerHTML = "";
       for (const section of sectionConfigs) {
@@ -185,7 +248,7 @@
         h2.textContent = section.title;
         const ul = document.createElement("ul");
         ul.className = "publication-list";
-        for (const entry of groupEntries) ul.appendChild(renderEntry(entry));
+        for (const entry of groupEntries) ul.appendChild(renderEntry(entry, submissionHistories[entry.id]));
         article.appendChild(h2);
         article.appendChild(ul);
         root.appendChild(article);
@@ -204,7 +267,9 @@
             return [section.key, parseBibtexEntries(text)];
           })
         );
-        renderPublications(Object.fromEntries(pairs));
+        const historyRes = await fetch(submissionHistoryPath);
+        const submissionHistories = historyRes.ok ? await historyRes.json() : {};
+        renderPublications(Object.fromEntries(pairs), submissionHistories);
       } catch (err) {
         root.innerHTML = "<p class=\"subtle\">Failed to load bib files</p>";
       }

@@ -1,0 +1,99 @@
+{
+  "__schema__": {
+    "description": "Use BibTeX entry ids as keys. Each value is an array of submission events in chronological order.",
+    "event": {
+      "round": "Submission 1",
+      "venue": "ACL 2025",
+      "result": "reject",
+      "date": "2025-02",
+      "note": "Optional short note"
+    },
+    "results": ["accept", "reject", "withdraw", "revise", "submit"]
+  },
+  "goto-etal-2026-edit": [
+    {
+      "round": "ARR 2026 Jan.",
+      "result": "reject",
+      "date": "2026"
+    },
+    {
+      "round": "BEA 2026.",
+      "result": "accept",
+      "date": "2026"
+    }
+  ],
+  "goto-etal-2025-reliability": [
+    {
+      "round": "ARR 2025 May.",
+      "result": "accept",
+      "date": "2025"
+    }
+  ],
+  "goto-etal-2025-improving": [
+    {
+      "round": "ARR 2024 June.",
+      "result": "reject",
+      "date": "2024"
+    },
+    {
+      "round": "ARR 2024 Dec.",
+      "result": "reject",
+      "date": "2024"
+    },
+    {
+      "round": "ARR 2025 Feb.",
+      "result": "reject",
+      "date": "2025"
+    },
+    {
+      "round": "ACL 2025 SRW",
+      "result": "accept",
+      "date": "2025"
+    }
+  ],
+  "sakai-etal-2025-impara": [
+    {
+      "round": "ARR 2025 Feb.",
+      "result": "accept",
+      "date": "2025"
+    }
+  ],
+  "goto-etal-2025-gec": [
+    {
+      "round": "ACL 2025 Demo.",
+      "result": "accept",
+      "date": "2025"
+    }
+  ],
+  "goto-etal-2025-rethinking": [
+    {
+      "round": "ARR 2025 Feb.",
+      "result": "accept",
+      "date": "2025"
+    }
+  ],
+  "goto-etal-2025-acquiring": [
+    {
+      "round": "ACL 2024 SRW.",
+      "result": "reject",
+      "date": "2024"
+    },
+    {
+      "round": "COLING 2025.",
+      "result": "accept",
+      "date": "2025"
+    }
+  ],
+  "gotou-etal-2020-taking": [
+    {
+      "round": "ACL 2020.",
+      "result": "reject",
+      "date": "2020"
+    },
+    {
+      "round": "COLING 2020.",
+      "result": "accept",
+      "date": "2020"
+    }
+  ]
+}
